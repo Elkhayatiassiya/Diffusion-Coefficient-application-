@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UNIFAC Diffusion Calculator</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        :root {
+            --primary-dark: #0d6efd;
+            --secondary-dark: #6c757d;
+            --bg-dark: #212529;
+            --text-dark: #f8f9fa;
+            --card-dark: #2c3034;
+            --border-dark: #495057;
+            
+            --primary-light: #1a237e; /* Bleu marine */
+            --secondary-light: #1976d2;
+            --bg-light: #ffffff; /* Blanc */
+            --text-light: #212529;
+            --card-light: #f8f9fa;
+            --border-light: #dee2e6;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            transition: all 0.5s ease;
+            background-image: url("{{ url_for('static', filename='images/background.png') }}");
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Dark Mode */
+        body.dark-mode {
+            background-color: var(--bg-dark);
+            color: var(--text-dark);
+        }
+
+        /* Light Mode */
+        body.light-mode {
+            background-color: var(--bg-light);
+            color: var(--text-light);
+        }
+
+        /* Top Bar */
+        .top-bar {
+            background-color: #4682b4; /* Sky blue for light mode */
+            color: white;
+            padding: 10px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        body.dark-mode .top-bar {
+            background-color: #87ceeb; /* Light sky blue for dark mode */
+        }
+
+        /* Result Bar */
+        .result-bar {
+            background-color: #d0f0ff; /* Very light sky blue */
+            color: black;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-size: 16px;
+            text-align: center;
+        }
+
+        /* Main Container */
+        .main-container {
+            background-color: rgba(0, 0, 0, 0.75);
+            border-radius: 20px;
+            color: white;
+            width: 90%;
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 2rem;
+            animation: zoomIn 0.8s ease-out;
+        }
+
+        .light-mode .main-container {
+            background-color: rgba(255, 255, 255, 0.9);
+            color: var(--text-light);
+            border: 1px solid var(--primary-light);
+        }
+
+        @keyframes zoomIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        h1 {
+            text-align: center;
+            color: #ffd369;
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+
+        .light-mode h1 {
+            color: var(--primary-light);
+        }
+
+        /* Form Elements */
+        .form-control {
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .dark-mode .form-control {
+            background-color: #343a40;
+            border-color: var(--border-dark);
+            color: var(--text-dark);
+        }
+
+        .dark-mode .form-control:focus {
+            background-color: #343a40;
+            color: var(--text-dark);
+            border-color: var(--primary-dark);
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+        }
+
+        .light-mode .form-control {
+            border-color: var(--primary-light);
+        }
+
+        .light-mode .form-control:focus {
+            border-color: var(--primary-light);
+            box-shadow: 0 0 0 0.25rem rgba(26, 35, 126, 0.25);
+        }
+
+        /* Buttons */
+        .btn-submit {
+            background-color: #4682b4;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-submit:hover {
+            background-color: #5a9bd3;
+            transform: translateY(-2px);
+        }
+
+        .btn-home {
+            background-color: #4682b4;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-home:hover {
+            background-color: #5a9bd3;
+            transform: translateY(-2px);
+        }
+
+        .logout-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #4682b4; /* Sky blue for light mode */
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .logout-btn:hover {
+            background-color: #5a9bd3; /* Slightly lighter blue on hover */
+        }
+
+        body.dark-mode .logout-btn {
+            background-color: #87ceeb; /* Light sky blue for dark mode */
+        }
+
+        .action-btn {
+            background-color: #4682b4; /* Sky blue for light mode */
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .action-btn:hover {
+            background-color: #5a9bd3; /* Slightly lighter blue on hover */
+        }
+
+        body.dark-mode .action-btn {
+            background-color: #87ceeb; /* Light sky blue for dark mode */
+        }
+
+        /* Flash messages */
+        .flash-message {
+            background-color: #dc3545;
+            color: white;
+            padding: 10px;
+            margin-top: 15px;
+            border-radius: 6px;
+            text-align: center;
+        }
+
+        /* Progress bar */
+        .progress {
+            height: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+
+        .progress-bar {
+            background-color: #0dcaf0;
+            width: 100%;
+            transition: width 1s ease;
+        }
+
+        .light-mode .progress-bar {
+            background-color: var(--primary-light);
+        }
+
+        /* Toggle Switch */
+        .mode-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .mode-toggle .btn {
+            background-color: var(--primary-dark);
+            color: white;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .light-mode .mode-toggle .btn {
+            background-color: var(--primary-light);
+        }
+
+        /* Form Icons */
+        .form-icon {
+            font-size: 1.5rem;
+            margin-right: 10px;
+            color: #0dcaf0;
+        }
+
+        .light-mode .form-icon {
+            color: var(--primary-light);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body class="dark-mode">
+    <!-- Top bar -->
+    <div class="top-bar">
+        Formulaire
+        <button class="logout-btn" onclick="window.location.href='{{ url_for('logout') }}'">Déconnexion</button>
+    </div>
+
+    <!-- Mode Toggle -->
+    <div class="mode-toggle">
+        <button id="modeToggle" class="btn btn-sm">
+            <i class="bi bi-moon-fill"></i>
+        </button>
+    </div>
+
+    <div class="container py-5">
+        <!-- Main Content Container -->
+        <div class="main-container">
+            <!-- Progress bar -->
+            <div class="progress mb-4">
+                <div class="progress-bar" role="progressbar"></div>
+            </div>
+
+            <!-- Result bar -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="result-bar">
+                    {% for category, message in messages %}
+                        {{ message }}
+                    {% endfor %}
+                </div>
+            {% endif %}
+            {% endwith %}
+
+            <h1><i class="bi bi-input-cursor-text form-icon"></i>Enter the values please</h1>
+            <form method="POST" action="{{ url_for('resultat') }}">
+                <div class="row">
+                    <div class="col-md-6">
+                        {% for name, label, icon in [
+                            ('x_A', 'Concentration de A (x_A)', 'bi-percent'),
+                            ('D_AB0', 'Diffusivité de A dans B (D_AB0)', 'bi-arrow-left-right'),
+                            ('D_BA0', 'Diffusivité de B dans A (D_BA0)', 'bi-arrow-right-left'),
+                            ('phi_A', 'phi de A (phi_A)', 'bi-greek-letter-phi'),
+                            ('phi_B', 'phi de B (phi_B)', 'bi-greek-letter-phi'),
+                            ('lambda_A', 'Lambda A', 'bi-greek-letter-lambda'),
+                            ('lambda_B', 'Lambda B', 'bi-greek-letter-lambda')
+                        ] %}
+                        <div class="mb-3">
+                            <label for="{{ name }}"><i class="bi {{ icon }} form-icon"></i>{{ label }}</label>
+                            <input type="text" class="form-control" id="{{ name }}" name="{{ name }}" required>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <div class="col-md-6">
+                        {% for name, label, icon in [
+                            ('theta_BA', 'Theta_BA', 'bi-theta'),
+                            ('theta_AB', 'Theta_AB', 'bi-theta'),
+                            ('theta_AA', 'Theta_AA', 'bi-theta'),
+                            ('theta_BB', 'Theta_BB', 'bi-theta'),
+                            ('tau_AB', 'Tau_AB', 'bi-tau'),
+                            ('tau_BA', 'Tau_BA', 'bi-tau'),
+                            ('q_A', 'Q_A', 'bi-q-circle'),
+                            ('q_B', 'Q_B', 'bi-q-circle')
+                        ] %}
+                        <div class="mb-3">
+                            <label for="{{ name }}"><i class="bi {{ icon }} form-icon"></i>{{ label }}</label>
+                            <input type="text" class="form-control" id="{{ name }}" name="{{ name }}" required>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-center gap-3">
+                    <button type="submit" class="btn btn-submit">
+                        <i class="bi bi-calculator"></i> Calculate
+                    </button>
+                    <a href="{{ url_for('home') }}" class="btn btn-home">
+                        <i class="bi bi-house-door"></i> Home
+                    </a>
+                </div>
+            </form>
+
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    <div class="flash-message mt-3">
+                        {% for message in messages %}
+                            <div><i class="bi bi-exclamation-triangle-fill"></i> {{ message }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Mode Toggle
+        const modeToggle = document.getElementById('modeToggle');
+        const body = document.body;
+        
+        // Check for saved user preference or use dark mode as default
+        const savedMode = localStorage.getItem('themeMode') || 'dark-mode';
+        body.classList.add(savedMode);
+        updateToggleIcon(savedMode);
+
+        modeToggle.addEventListener('click', () => {
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                body.classList.add('light-mode');
+                localStorage.setItem('themeMode', 'light-mode');
+                updateToggleIcon('light-mode');
+            } else {
+                body.classList.remove('light-mode');
+                body.classList.add('dark-mode');
+                localStorage.setItem('themeMode', 'dark-mode');
+                updateToggleIcon('dark-mode');
+            }
+        });
+
+        function updateToggleIcon(mode) {
+            if (mode === 'dark-mode') {
+                modeToggle.innerHTML = '<i class="bi bi-moon-fill"></i>';
+            } else {
+                modeToggle.innerHTML = '<i class="bi bi-sun-fill"></i>';
+            }
+        }
+
+        // Auto-dismiss flash messages after 5 seconds
+        const flashMessage = document.querySelector('.flash-message');
+        if (flashMessage) {
+            setTimeout(() => {
+                flashMessage.style.display = 'none';
+            }, 5000);
+        }
+    </script>
+</body>
+</html>

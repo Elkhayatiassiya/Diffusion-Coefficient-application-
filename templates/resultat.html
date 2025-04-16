@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Résultat du calcul</title>
+</head>
+<body>
+    <h2>Résultat du calcul</h2>
+    <p><strong>Coefficient de diffusion (D_AB) :</strong> {{ D_AB }} m²/s</p>
+    <p><strong>Erreur :</strong> {{ error }} %</p>
+
+    <a href="{{ url_for('formulaire') }}">Retour au formulaire</a>
+</body>
+</html>

@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - UNIFAC Calculator</title>
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1a237e; /* Navy blue */
+            --secondary: #1976d2; /* Bright blue */
+            --dark: #0d47a1; /* Dark blue */
+            --light: #ffffff; /* White */
+            --accent: #e3f2fd; /* Light blue background */
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--accent);
+            color: #333;
+            transition: all 0.4s ease;
+            overflow-x: hidden;
+        }
+
+        .dark-mode {
+            background-color: #121212;
+            color: #f5f5f5;
+            --light: #1e1e1e;
+            --primary: #0d47a1;
+            --secondary: #64b5f6;
+            --accent: #0d1b2a;
+        }
+
+        /* Scientific Background Pattern */
+        .scientific-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(25, 118, 210, 0.05) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(26, 35, 126, 0.05) 0%, transparent 20%);
+            z-index: -1;
+            opacity: 0.6;
+        }
+
+        .dark-mode .scientific-bg {
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(100, 181, 246, 0.05) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(13, 71, 161, 0.05) 0%, transparent 20%);
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            width: 100%;
+            height: 8px;
+            background-color: rgba(25, 118, 210, 0.2);
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1001;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background-color: var(--secondary);
+            width: 0%;
+            transition: width 0.4s ease;
+        }
+
+        /* Signup Container */
+        .signup-container {
+            max-width: 600px;
+            margin: 100px auto;
+            padding: 2rem;
+            background-color: var(--light);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(25, 118, 210, 0.1);
+        }
+
+        .dark-mode .signup-container {
+            background-color: #1e1e1e;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            border-color: rgba(100, 181, 246, 0.1);
+        }
+
+        /* Welcome Section */
+        .welcome-section {
+            padding: 2rem;
+        }
+
+        .welcome-icon {
+            font-size: 4rem;
+            color: var(--secondary);
+            margin-bottom: 1.5rem;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+            40% {transform: translateY(-20px);}
+            60% {transform: translateY(-10px);}
+        }
+
+        .welcome-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+
+        .dark-mode .welcome-title {
+            color: var(--secondary);
+        }
+
+        .welcome-text {
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        /* Question Section */
+        .question-section {
+            display: none;
+            padding: 2rem;
+        }
+
+        .question-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--primary);
+            position: relative;
+        }
+
+        .dark-mode .question-title {
+            color: var(--secondary);
+        }
+
+        .question-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 3px;
+            background-color: var(--secondary);
+        }
+
+        .options-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .option-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+            border: 2px solid rgba(25, 118, 210, 0.3);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background-color: transparent;
+        }
+
+        .option-btn:hover {
+            border-color: var(--secondary);
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(25, 118, 210, 0.2);
+        }
+
+        .option-btn i {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--secondary);
+        }
+
+        .option-btn.selected {
+            background-color: rgba(25, 118, 210, 0.1);
+            border-color: var(--secondary);
+        }
+
+        /* Navigation Buttons */
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 0.8rem 1.8rem;
+            border-radius: 30px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .btn-primary {
+            background-color: var(--secondary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--dark);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            color: var(--secondary);
+            border: 2px solid var(--secondary);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--secondary);
+            color: white;
+        }
+
+        /* Signup Form */
+        .signup-form {
+            display: none;
+            text-align: left;
+            padding: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 2px solid rgba(25, 118, 210, 0.3);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: var(--secondary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.2);
+        }
+
+        .password-hint {
+            font-size: 0.8rem;
+            color: #6c757d;
+            margin-top: 0.5rem;
+        }
+
+        .dark-mode .password-hint {
+            color: #aaa;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .options-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .signup-container {
+                margin: 80px auto;
+                padding: 1.5rem;
+            }
+            
+            .welcome-title {
+                font-size: 1.8rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .signup-container {
+                margin: 60px 15px;
+                padding: 1rem;
+            }
+            
+            .welcome-title {
+                font-size: 1.5rem;
+            }
+            
+            .question-title {
+                font-size: 1.3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Scientific Background -->
+    <div class="scientific-bg"></div>
+
+    <!-- Progress Bar -->
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <!-- Signup Container -->
+    <div class="signup-container">
+        <!-- Welcome Section -->
+        <div class="welcome-section" id="welcomeSection">
+            <i class="bi bi-emoji-heart-eyes welcome-icon"></i>
+            <h1 class="welcome-title">Welcome to UNIFAC Calculator</h1>
+            <p class="welcome-text">
+                We're excited to have you! Answer a few quick questions
+                to personalize your experience before creating your account.
+            </p>
+            <button class="btn btn-primary" id="startBtn">Get Started <i class="bi bi-arrow-right"></i></button>
+        </div>
+
+        <!-- Question 1: How did you hear about us? -->
+        <div class="question-section" id="question1">
+            <h2 class="question-title">How did you hear about us?</h2>
+            <div class="options-container">
+                <button class="option-btn" data-value="google">
+                    <i class="bi bi-google"></i>
+                    <span>Google</span>
+                </button>
+                <button class="option-btn" data-value="linkedin">
+                    <i class="bi bi-linkedin"></i>
+                    <span>LinkedIn</span>
+                </button>
+                <button class="option-btn" data-value="facebook">
+                    <i class="bi bi-facebook"></i>
+                    <span>Facebook</span>
+                </button>
+                <button class="option-btn" data-value="twitter">
+                    <i class="bi bi-twitter"></i>
+                    <span>Twitter</span>
+                </button>
+                <button class="option-btn" data-value="friends">
+                    <i class="bi bi-people-fill"></i>
+                    <span>Friends/Colleagues</span>
+                </button>
+                <button class="option-btn" data-value="other">
+                    <i class="bi bi-question-circle"></i>
+                    <span>Other</span>
+                </button>
+            </div>
+            <div class="nav-buttons">
+                <button class="btn btn-outline" id="backToWelcome1"><i class="bi bi-arrow-left"></i> Back</button>
+                <button class="btn btn-primary" id="nextToQuestion2">Next <i class="bi bi-arrow-right"></i></button>
+            </div>
+        </div>
+
+        <!-- Question 2: What's your field? -->
+        <div class="question-section" id="question2">
+            <h2 class="question-title">What's your field of work/study?</h2>
+            <div class="options-container">
+                <button class="option-btn" data-value="engineering">
+                    <i class="bi bi-gear-fill"></i>
+                    <span>Engineering</span>
+                </button>
+                <button class="option-btn" data-value="science">
+                    <i class="bi bi-flask"></i>
+                    <span>Science</span>
+                </button>
+                <button class="option-btn" data-value="health">
+                    <i class="bi bi-heart-pulse"></i>
+                    <span>Health</span>
+                </button>
+                <button class="option-btn" data-value="arts">
+                    <i class="bi bi-palette"></i>
+                    <span>Arts/Culture</span>
+                </button>
+                <button class="option-btn" data-value="literature">
+                    <i class="bi bi-book"></i>
+                    <span>Literature</span>
+                </button>
+                <button class="option-btn" data-value="other">
+                    <i class="bi bi-question-circle"></i>
+                    <span>Other</span>
+                </button>
+            </div>
+            <div class="nav-buttons">
+                <button class="btn btn-outline" id="backToQuestion1"><i class="bi bi-arrow-left"></i> Back</button>
+                <button class="btn btn-primary" id="nextToQuestion3">Next <i class="bi bi-arrow-right"></i></button>
+            </div>
+        </div>
+
+        <!-- Question 3: Education level -->
+        <div class="question-section" id="question3">
+            <h2 class="question-title">What's your education level?</h2>
+            <div class="options-container">
+                <button class="option-btn" data-value="bachelor">
+                    <i class="bi bi-mortarboard"></i>
+                    <span>Bachelor's</span>
+                </button>
+                <button class="option-btn" data-value="master">
+                    <i class="bi bi-award"></i>
+                    <span>Master's</span>
+                </button>
+                <button class="option-btn" data-value="phd">
+                    <i class="bi bi-stars"></i>
+                    <span>PhD</span>
+                </button>
+                <button class="option-btn" data-value="student">
+                    <i class="bi bi-journal-bookmark"></i>
+                    <span>Student</span>
+                </button>
+                <button class="option-btn" data-value="professional">
+                    <i class="bi bi-briefcase"></i>
+                    <span>Professional</span>
+                </button>
+                <button class="option-btn" data-value="other">
+                    <i class="bi bi-question-circle"></i>
+                    <span>Other</span>
+                </button>
+            </div>
+            <div class="nav-buttons">
+                <button class="btn btn-outline" id="backToQuestion2"><i class="bi bi-arrow-left"></i> Back</button>
+                <button class="btn btn-primary" id="nextToSignup">Next <i class="bi bi-arrow-right"></i></button>
+            </div>
+        </div>
+
+        <!-- Signup Form -->
+        <div class="signup-form" id="signupForm">
+            <h2 class="question-title">Create Your Account</h2>
+            <form method="POST" action="{{ url_for('signup') }}" id="registrationForm">
+                <input type="hidden" name="referral_source" id="referralSource">
+                <input type="hidden" name="field" id="userField">
+                <input type="hidden" name="education_level" id="educationLevel">
+                
+                <div class="form-group">
+                    <input type="text" class="form-control" name="username" placeholder="Username" required>
+                </div>
+                <div class="form-group">
+                    <input type="text" class="form-control" name="firstname" placeholder="First Name" required>
+                </div>
+                <div class="form-group">
+                    <input type="email" class="form-control" name="email" placeholder="Email" required>
+                </div>
+                <div class="form-group">
+                    <input type="password" class="form-control" name="password" placeholder="Password" required>
+                    <small class="password-hint">Minimum 8 characters with uppercase and number</small>
+                </div>
+                
+                <div class="nav-buttons">
+                    <button class="btn btn-outline" id="backToQuestion3"><i class="bi bi-arrow-left"></i> Back</button>
+                    <button type="submit" class="btn btn-primary">Sign Up <i class="bi bi-check2"></i></button>
+                </div>
+                <div class="text-center mt-3">
+                    <a href="{{ url_for('login') }}" class="btn btn-outline">Already have an account? Log in</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const welcomeSection = document.getElementById('welcomeSection');
+        const question1 = document.getElementById('question1');
+        const question2 = document.getElementById('question2');
+        const question3 = document.getElementById('question3');
+        const signupForm = document.getElementById('signupForm');
+        const progressBar = document.getElementById('progressBar');
+        
+        // Navigation Buttons
+        const startBtn = document.getElementById('startBtn');
+        const nextToQuestion2 = document.getElementById('nextToQuestion2');
+        const nextToQuestion3 = document.getElementById('nextToQuestion3');
+        const nextToSignup = document.getElementById('nextToSignup');
+        const backToWelcome1 = document.getElementById('backToWelcome1');
+        const backToQuestion1 = document.getElementById('backToQuestion1');
+        const backToQuestion2 = document.getElementById('backToQuestion2');
+        const backToQuestion3 = document.getElementById('backToQuestion3');
+        
+        // Form Inputs
+        const referralSource = document.getElementById('referralSource');
+        const userField = document.getElementById('userField');
+        const educationLevel = document.getElementById('educationLevel');
+        
+        // User Responses
+        const userResponses = {
+            referral: null,
+            field: null,
+            education: null
+        };
+        
+        // Option Selection
+        document.querySelectorAll('.option-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                // Remove selected class from all buttons in this question
+                const parentContainer = this.closest('.options-container');
+                parentContainer.querySelectorAll('.option-btn').forEach(b => {
+                    b.classList.remove('selected');
+                });
+                
+                // Add selected class to clicked button
+                this.classList.add('selected');
+                
+                // Store the selected value
+                const questionId = this.closest('.question-section').id;
+                const value = this.getAttribute('data-value');
+                
+                if (questionId === 'question1') {
+                    userResponses.referral = value;
+                } else if (questionId === 'question2') {
+                    userResponses.field = value;
+                } else if (questionId === 'question3') {
+                    userResponses.education = value;
+                }
+            });
+        });
+        
+        // Navigation Functions
+        function showSection(sectionToShow) {
+            welcomeSection.style.display = 'none';
+            question1.style.display = 'none';
+            question2.style.display = 'none';
+            question3.style.display = 'none';
+            signupForm.style.display = 'none';
+            
+            sectionToShow.style.display = 'block';
+            
+            // Update progress bar
+            if (sectionToShow === welcomeSection) {
+                progressBar.style.width = '0%';
+            } else if (sectionToShow === question1) {
+                progressBar.style.width = '20%';
+            } else if (sectionToShow === question2) {
+                progressBar.style.width = '50%';
+            } else if (sectionToShow === question3) {
+                progressBar.style.width = '80%';
+            } else if (sectionToShow === signupForm) {
+                progressBar.style.width = '100%';
+                // Set hidden inputs with user responses
+                referralSource.value = userResponses.referral;
+                userField.value = userResponses.field;
+                educationLevel.value = userResponses.education;
+            }
+        }
+        
+        // Event Listeners
+        startBtn.addEventListener('click', () => showSection(question1));
+        
+        nextToQuestion2.addEventListener('click', () => {
+            if (userResponses.referral) {
+                showSection(question2);
+            } else {
+                alert('Please select an option');
+            }
+        });
+        
+        nextToQuestion3.addEventListener('click', () => {
+            if (userResponses.field) {
+                showSection(question3);
+            } else {
+                alert('Please select an option');
+            }
+        });
+        
+        nextToSignup.addEventListener('click', () => {
+            if (userResponses.education) {
+                showSection(signupForm);
+            } else {
+                alert('Please select an option');
+            }
+        });
+        
+        backToWelcome1.addEventListener('click', () => showSection(welcomeSection));
+        backToQuestion1.addEventListener('click', () => showSection(question1));
+        backToQuestion2.addEventListener('click', () => showSection(question2));
+        backToQuestion3.addEventListener('click', () => showSection(question3));
+        
+        // Form Validation
+        document.getElementById('registrationForm').addEventListener('submit', function(e) {
+            const password = this.elements['password'].value;
+            
+            if (password.length < 8 || !/[A-Z]/.test(password) || !/[0-9]/.test(password)) {
+                e.preventDefault();
+                alert("Password must contain:\n- Minimum 8 characters\n- 1 uppercase letter\n- 1 number");
+            }
+        });
+    </script>
+</body>
+</html>
